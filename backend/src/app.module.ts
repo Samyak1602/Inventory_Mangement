@@ -22,6 +22,7 @@ import { ProductModule } from './product/product.module';
     }),
     UsersModule,
     AuthModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],
