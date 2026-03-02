@@ -1,4 +1,9 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -26,5 +31,22 @@ export class AuthService {
     const { password: _, ...userWithoutPassword } = user;
 
     return userWithoutPassword;
+  }
+
+  async login(createUserDto: CreateUserDto) {
+    const { email, password } = createUserDto;
+
+    const existingUser = await this.usersService.findByEmail(email);
+
+    if (existingUser) {
+      const isMatch = await bcrypt.compare(password, existingUser.password);
+
+      if (isMatch) {
+        const { password: _, ...result } = existingUser;
+        return result;
+      }
+    }
+
+    throw new UnauthorizedException();
   }
 }

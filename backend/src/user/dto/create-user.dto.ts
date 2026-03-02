@@ -8,8 +8,9 @@ import {
 import { UserRole } from '../entities/user.entity';
 
 export class CreateUserDto {
+  @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @IsEmail()
   email: string;
