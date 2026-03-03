@@ -9,7 +9,7 @@ import {
 @Entity('product')
 export class Product {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column({ length: 100 })
   name: string;
@@ -20,7 +20,7 @@ export class Product {
   @Column()
   category: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2 }) //precision is total digits, scale is decimal places
   price: number;
 
   @Column()

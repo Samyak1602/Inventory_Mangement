@@ -8,6 +8,7 @@ interface CustomerForm {
     email: string;
     phone: string;
     city: string;
+    address: string;
 }
 
 const emptyForm: CustomerForm = {
@@ -15,6 +16,7 @@ const emptyForm: CustomerForm = {
     email: "",
     phone: "",
     city: "",
+    address: "",
 };
 
 export default function CustomerPage() {
@@ -97,6 +99,7 @@ export default function CustomerPage() {
             email: customer.email,
             phone: customer.phone,
             city: customer.city || "",
+            address: customer.address || "",
         });
         setFormError("");
         setEditingId(customer.id);
@@ -109,8 +112,8 @@ export default function CustomerPage() {
         setFormError("");
 
         // Validation
-        if (!form.name || !form.email || !form.phone) {
-            setFormError("Please fill in all required fields");
+        if (!form.name || !form.email || !form.phone || !form.address) {
+            setFormError("Please fill in all required fields (including address)");
             return;
         }
 
@@ -135,6 +138,7 @@ export default function CustomerPage() {
                 email: form.email,
                 phone: form.phone,
                 city: form.city || undefined,
+                address: form.address || undefined,
             };
 
             if (modalMode === "edit" && editingId) {
@@ -415,6 +419,17 @@ export default function CustomerPage() {
                                             onChange={(e) => updateField("city", e.target.value)}
                                         />
                                     </div>
+                                </div>
+
+                                <div className="input-group">
+                                    <label className="input-label">Address *</label>
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        placeholder="e.g. 123 Main St"
+                                        value={form.address}
+                                        onChange={(e) => updateField("address", e.target.value)}
+                                    />
                                 </div>
                             </div>
 

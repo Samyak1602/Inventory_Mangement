@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Repository } from 'typeorm';
@@ -10,7 +10,7 @@ export class ProductService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
-  ) {}
+  ) { }
 
   async create(createProductDto: CreateProductDto) {
     const sku = await this.generateUniqueSKU(createProductDto);
@@ -24,7 +24,6 @@ export class ProductService {
   }
 
   private async generateUniqueSKU(productData: any): Promise<string> {
-    // Method 1: Category + Random Number
     const prefix = productData.category?.substring(0, 3).toUpperCase() || 'PRD';
     const timestamp = Date.now().toString().slice(-6);
     const random = Math.floor(Math.random() * 1000)
@@ -32,22 +31,55 @@ export class ProductService {
       .padStart(3, '0');
 
     return `${prefix}-${timestamp}-${random}`;
-    // Example: ELE-234567-123
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll(search?: string, page: number = 1, limit: number = 10) {
+    const query = this.productRepository.createQueryBuilder('product');
+
+    if (search) {
+      query.where(
+        'product.name LIKE :search OR product.sku LIKE :search OR product.category LIKE :search',
+        { search: `%${search}%` },
+      );
+    }
+
+    const [data, total] = await query
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number) {
+    const product = await this.productRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const product = await this.productRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    await this.productRepository.update(id, updateProductDto);
+    return this.productRepository.findOne({ where: { id } });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number) {
+    const product = await this.productRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    await this.productRepository.delete(id);
+    return { message: 'Product deleted successfully' };
   }
 }
