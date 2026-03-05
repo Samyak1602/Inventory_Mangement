@@ -1,0 +1,70 @@
+# ===================================================
+# Netlify Configuration for Frontend Deployment
+# ===================================================
+# This config tells Netlify how to build and serve
+# the Next.js frontend from the "frontend" subfolder.
+# ===================================================
+
+[build]
+  # The frontend is in the "frontend" subfolder
+  base = "frontend"
+  
+  # Build command for Next.js
+  command = "npm install && npm run build"
+  
+  # Next.js output directory (handled by @netlify/plugin-nextjs)
+  publish = "frontend/.next"
+
+# ===================================================
+# Environment Variables (set these in Netlify Dashboard)
+# ===================================================
+# Go to: Site Settings > Environment Variables
+# Add: PUBLIC_API_URL = https://your-backend-url.com
+# ===================================================
+
+[build.environment]
+  NODE_VERSION = "20"
+  # PUBLIC_API_URL will be set in Netlify Dashboard
+
+# ===================================================
+# Next.js Plugin for Netlify
+# ===================================================
+# This plugin handles SSR, API routes, and redirects
+# automatically for Next.js apps on Netlify.
+# ===================================================
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# ===================================================
+# Redirect Rules (Fallback for SPA-like behavior)
+# ===================================================
+# These redirects ensure that direct URL access works
+# properly and doesn't result in 404 errors.
+# ===================================================
+
+# Redirect root to login page
+[[redirects]]
+  from = "/"
+  to = "/login"
+  status = 302
+
+# Handle all other routes - let Next.js handle them
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/___netlify-handler"
+  status = 200
+
+# ===================================================
+# Headers for Security and Performance
+# ===================================================
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

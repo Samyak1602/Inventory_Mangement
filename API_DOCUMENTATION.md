@@ -457,7 +457,7 @@ The frontend (Next.js) should run on `http://localhost:3000` and make API calls 
 
 **Environment variable** (`frontend/.env.local`):
 ```
-NEXT_PUBLIC_API_URL=http://localhost:3001/api
+PUBLIC_API_URL=http://localhost:3001/api
 ```
 
 ### API Helper (`lib/api.ts`)
@@ -465,7 +465,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001/api
 Create a centralized API helper:
 
 ```typescript
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_URL = process.env.PUBLIC_API_URL || 'http://localhost:3001/api';
 
 export async function apiRequest<T>(
   endpoint: string,
