@@ -15,7 +15,8 @@ async function bootstrap() {
     origin: '*', // Automatically bypass strict origin check due to tunnel testing (or keep arrays)
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: 'Content-Type, Authorization, Accept, Access-Control-Allow-Private-Network',
+    allowedHeaders:
+      'Content-Type, Authorization, Accept, Access-Control-Allow-Private-Network',
   });
 
   app.useGlobalPipes(
