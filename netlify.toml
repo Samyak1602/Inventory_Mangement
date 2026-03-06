@@ -19,12 +19,12 @@
 # Environment Variables (set these in Netlify Dashboard)
 # ===================================================
 # Go to: Site Settings > Environment Variables
-# Add: PUBLIC_API_URL = https://your-backend-url.com
+# Add: NEXT_PUBLIC_API_URL = https://your-backend-url.com
 # ===================================================
 
 [build.environment]
   NODE_VERSION = "20"
-  # PUBLIC_API_URL will be set in Netlify Dashboard
+  # NEXT_PUBLIC_API_URL will be set in Netlify Dashboard
 
 # ===================================================
 # Next.js Plugin for Netlify
