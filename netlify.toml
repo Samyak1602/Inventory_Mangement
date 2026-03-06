@@ -48,12 +48,6 @@
   to = "/login"
   status = 302
 
-# Handle all other routes - let Next.js handle them
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/___netlify-handler"
-  status = 200
-
 # ===================================================
 # Headers for Security and Performance
 # ===================================================
