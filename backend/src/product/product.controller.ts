@@ -11,10 +11,11 @@ import {
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { parsePaginationParams } from '../common/utils/pagination.util';
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productService: ProductService) { }
+  constructor(private readonly productService: ProductService) {}
 
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
@@ -27,11 +28,8 @@ export class ProductController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    return this.productService.findAll(
-      search,
-      page ? parseInt(page, 10) : 1,
-      limit ? parseInt(limit, 10) : 10,
-    );
+    const { page: parsedPage, limit: parsedLimit } = parsePaginationParams(page, limit);
+    return this.productService.findAll(search, parsedPage, parsedLimit);
   }
 
   @Get(':id')

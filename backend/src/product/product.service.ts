@@ -4,13 +4,14 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
+import { buildPaginationResponse } from '../common/utils/pagination.util';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
-  ) { }
+  ) {}
 
   async create(createProductDto: CreateProductDto) {
     const sku = await this.generateUniqueSKU(createProductDto);
@@ -48,38 +49,30 @@ export class ProductService {
       .take(limit)
       .getManyAndCount();
 
-    return {
-      data,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return buildPaginationResponse(data, total, page, limit);
   }
 
   async findOne(id: number) {
-    const product = await this.productRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
-    return product;
+    return this.findProductOrFail(id);
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
-    const product = await this.productRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
+    await this.findProductOrFail(id);
     await this.productRepository.update(id, updateProductDto);
     return this.productRepository.findOne({ where: { id } });
   }
 
   async remove(id: number) {
+    await this.findProductOrFail(id);
+    await this.productRepository.delete(id);
+    return { message: 'Product deleted successfully' };
+  }
+
+  private async findProductOrFail(id: number): Promise<Product> {
     const product = await this.productRepository.findOne({ where: { id } });
     if (!product) {
       throw new NotFoundException('Product not found');
     }
-    await this.productRepository.delete(id);
-    return { message: 'Product deleted successfully' };
+    return product;
   }
 }

@@ -79,60 +79,39 @@ export const authApi = {
         apiRequest<User>("/auth/signup", { method: "POST", body: JSON.stringify(data) }),
 };
 
+function buildQuery(params?: Record<string, string | number | undefined>): string {
+    const query = new URLSearchParams();
+    if (params) {
+        for (const [key, value] of Object.entries(params)) {
+            if (value !== undefined && value !== null && value !== "") query.set(key, String(value));
+        }
+    }
+    return query.toString();
+}
+
+function createCrudApi<T, P extends Record<string, string | number | undefined> = Record<string, string | number | undefined>>(basePath: string) {
+    return {
+        getAll: (params?: P) =>
+            apiRequest<PaginatedResponse<T>>(`${basePath}?${buildQuery(params)}`),
+        getOne: (id: number) =>
+            apiRequest<T>(`${basePath}/${id}`),
+        create: (data: Partial<T>) =>
+            apiRequest<T>(basePath, { method: "POST", body: JSON.stringify(data) }),
+        update: (id: number, data: Partial<T>) =>
+            apiRequest<T>(`${basePath}/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+        delete: (id: number) =>
+            apiRequest<{ message: string }>(`${basePath}/${id}`, { method: "DELETE" }),
+    };
+}
+
 // ===== Products =====
-export const productsApi = {
-    getAll: (params?: { search?: string; page?: number; limit?: number }) => {
-        const query = new URLSearchParams();
-        if (params?.search) query.set("search", params.search);
-        if (params?.page) query.set("page", String(params.page));
-        if (params?.limit) query.set("limit", String(params.limit));
-        return apiRequest<PaginatedResponse<Product>>(`/products?${query.toString()}`);
-    },
-    getOne: (id: number) => apiRequest<Product>(`/products/${id}`),
-    create: (data: Partial<Product>) =>
-        apiRequest<Product>("/products", { method: "POST", body: JSON.stringify(data) }),
-    update: (id: number, data: Partial<Product>) =>
-        apiRequest<Product>(`/products/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
-    delete: (id: number) =>
-        apiRequest<{ message: string }>(`/products/${id}`, { method: "DELETE" }),
-};
+export const productsApi = createCrudApi<Product, { search?: string; page?: number; limit?: number }>("/products");
 
 // ===== Customers =====
-export const customersApi = {
-    getAll: (params?: { search?: string; page?: number; limit?: number }) => {
-        const query = new URLSearchParams();
-        if (params?.search) query.set("search", params.search);
-        if (params?.page) query.set("page", String(params.page));
-        if (params?.limit) query.set("limit", String(params.limit));
-        return apiRequest<PaginatedResponse<Customer>>(`/customers?${query.toString()}`);
-    },
-    getOne: (id: number) => apiRequest<Customer>(`/customers/${id}`),
-    create: (data: Partial<Customer>) =>
-        apiRequest<Customer>("/customers", { method: "POST", body: JSON.stringify(data) }),
-    update: (id: number, data: Partial<Customer>) =>
-        apiRequest<Customer>(`/customers/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
-    delete: (id: number) =>
-        apiRequest<{ message: string }>(`/customers/${id}`, { method: "DELETE" }),
-};
+export const customersApi = createCrudApi<Customer, { search?: string; page?: number; limit?: number }>("/customers");
 
 // ===== Orders =====
-export const ordersApi = {
-    getAll: (params?: { search?: string; status?: string; page?: number; limit?: number }) => {
-        const query = new URLSearchParams();
-        if (params?.search) query.set("search", params.search);
-        if (params?.status) query.set("status", params.status);
-        if (params?.page) query.set("page", String(params.page));
-        if (params?.limit) query.set("limit", String(params.limit));
-        return apiRequest<PaginatedResponse<Order>>(`/orders?${query.toString()}`);
-    },
-    getOne: (id: number) => apiRequest<Order>(`/orders/${id}`),
-    create: (data: Partial<Order>) =>
-        apiRequest<Order>("/orders", { method: "POST", body: JSON.stringify(data) }),
-    update: (id: number, data: Partial<Order>) =>
-        apiRequest<Order>(`/orders/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
-    delete: (id: number) =>
-        apiRequest<{ message: string }>(`/orders/${id}`, { method: "DELETE" }),
-};
+export const ordersApi = createCrudApi<Order, { search?: string; status?: string; page?: number; limit?: number }>("/orders");
 
 // ===== Seed =====
 export const seedApi = {
